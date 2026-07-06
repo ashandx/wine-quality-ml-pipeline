@@ -1,8 +1,8 @@
 # Wine Quality: End-to-End ML Pipeline
 
 Binary classification of red wine quality (good `quality >= 6` vs bad `quality < 6`) from
-physicochemical properties. Week 6 Milestone 2 project — the focus is pipeline discipline
-and evaluation methodology, not chasing a single accuracy number.
+physicochemical properties. Focused on pipeline discipline
+and evaluation methodology rather than chasing a single accuracy number.
 
 ## Project Overview
 
@@ -16,7 +16,7 @@ on the harder-to-separate quality boundary, with accuracy and ROC-AUC as seconda
 ## Setup
 
 ```bash
-conda create -n wine-quality-ml-pipeline python=3.11
+conda create -n wine-quality-ml-pipeline python=3.12
 conda activate wine-quality-ml-pipeline
 pip install -r requirements.txt
 ```
@@ -27,13 +27,30 @@ pip install -r requirements.txt
 
 ```bash
 conda activate wine-quality-ml-pipeline
-jupyter notebook notebooks/milestone2_wine_quality.ipynb
+jupyter notebook notebooks/wine_quality_pipeline.ipynb
 ```
 
 ## Key Findings
 
-_TODO — fill in once the notebook is complete: baseline F1, best model, CV F1 vs holdout F1,
-what the learning curve showed._
+| Model | Mean CV F1 | Std F1 |
+|---|---|---|
+| DummyClassifier (baseline) | 0.6969 | 0.0006 |
+| Logistic Regression | 0.7605 | 0.0161 |
+| Gradient Boosting | 0.7869 | 0.0138 |
+| Random Forest | 0.8089 | 0.0150 |
+
+Random Forest won cross-validation and held up on the holdout set, scoring 0.81, almost
+identical to its CV mean. All three real models cleared the baseline by a wide margin.
+Logistic Regression came in weakest, which tracks with the EDA: individual features
+correlated only weakly with quality, so a linear boundary had less to work with than a
+model that captures interactions.
+
+The learning curve showed training F1 pinned at 1.0 across every training size while
+validation F1 climbed from about 0.75 to 0.81 before flattening. That gap never closed,
+pointing to Random Forest's unconstrained default tree depth rather than a shortage of
+data. Regularizing the model (capping `max_depth`, raising `min_samples_leaf`) is the
+most promising next step, followed by feature engineering on the sulfur dioxide and
+acidity measures given how weak their individual correlations were.
 
 ## Skills Demonstrated
 
